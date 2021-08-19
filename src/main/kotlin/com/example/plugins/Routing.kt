@@ -201,7 +201,7 @@ fun Application.configureRouting() {
             date?.also { task.date = it }
             done?.also { task.done = it.toBoolean() }
 
-            stm.execute("update tasks set date=${task.date}, name =${task.name},  done =${task.done}  where id=$id")
+            stm.execute("update tasks set date=\'${task.date}\', name =\'${task.name}\',  done =${task.done}  where id=$id")
 
             call.respondText(task.toString())
         }
