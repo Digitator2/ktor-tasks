@@ -1,0 +1,1 @@
+web: ./build/install/ktor-tasks/bin/ktor-tasks
