@@ -34,6 +34,7 @@ fun StringBuilder.addTasks(seq:List<Task>) {
 
 fun ResultSet.toList(): MutableList<Task> {
     val rs = this@toList
+
     /*
     val seq = rs.use {
          sequence<Task> {
@@ -56,7 +57,6 @@ fun ResultSet.toList(): MutableList<Task> {
                 if (rs.next()) Task(rs.getInt(1), rs.getString(2), rs.getBoolean(3), rs.getString(4))
                 else null
         }.toMutableList()  // must be inside the use() block
-
 
 
     /*
@@ -189,10 +189,14 @@ fun Application.configureRouting() {
 
             //done?.also { task.done = it.toBoolean() }
 
+            stm.execute("begin transaction isolation level SERIALIZABLE ")
+
             stm.execute("insert into tasks(name, done, date) values (\'${task.name}\', ${task.done}, \'${task.date}\' )")
 
             val rs = stm.executeQuery("select id, name, done, date from tasks where id in (select max(id) from tasks)")
             val taskRes = rs.toList().firstOrNull() ?: return@get call.respond(HttpStatusCode.NotFound)
+
+            stm.execute("commit transaction")
 
             call.respondText(taskRes.toString())
         }
