@@ -247,7 +247,7 @@ fun Application.configureRouting() {
             call.respondText("non implemented")
         }
 
-        get("tasks/help") {
+        get("help") {
 
             call.respondText("""
                 tasks
