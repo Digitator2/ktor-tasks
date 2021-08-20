@@ -194,7 +194,14 @@ fun Application.configureRouting() {
             stm.execute("insert into tasks(name, done, date) values (\'${task.name}\', ${task.done}, \'${task.date}\' )")
 
             val rs = stm.executeQuery("select id, name, done, date from tasks where id in (select max(id) from tasks)")
-            val taskRes = rs.toList().firstOrNull() ?: return@get call.respond(HttpStatusCode.NotFound)
+
+            //val taskRes = rs.toList().firstOrNull() ?: return@get call.respond(HttpStatusCode.NotFound)
+
+            val taskRes = rs.toList().firstOrNull() ?: run {
+                stm.execute("rollback transaction")
+                return@get call.respond(HttpStatusCode.NotFound)
+            }
+            // data?.let { /* execute this block if not null */ } ?: run { /* execute this block if null */ }
 
             stm.execute("commit transaction")
 
