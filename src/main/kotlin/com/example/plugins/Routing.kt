@@ -10,6 +10,7 @@ import io.ktor.gson.*
 import io.ktor.html.*
 import io.ktor.util.*
 import java.lang.StringBuilder
+import java.net.Inet4Address
 import java.net.URI
 import java.sql.Connection
 import java.sql.DriverManager
@@ -50,12 +51,21 @@ fun ResultSet.toList(): MutableList<Task> {
         }.toList()  // must be inside the use() block
     }
     */
+
+    val lst = generateSequence {
+                if (rs.next()) Task(rs.getInt(1), rs.getString(2), rs.getBoolean(3), rs.getString(4))
+                else null
+        }.toMutableList()  // must be inside the use() block
+
+
+
+    /*
     val lst = mutableListOf<Task>()
     while (rs.next()){
         lst.add( Task(rs.getInt(1), rs.getString(2), rs.getBoolean(3), rs.getString(4))  )
-    }
+    }*/
 
-    //if(!rs.isClosed) rs.close()
+    if(!rs.isClosed) rs.close()
 
     return lst
 }
@@ -130,10 +140,12 @@ fun Application.configureRouting() {
 
             val rs = stm.executeQuery("select id, name, done, date from tasks")
 
+            println("remoteHost: " + call.request.origin.remoteHost) // https://stackoverflow.com/questions/64482537/how-to-get-ip-address-from-call-object
+            //Inet4Address.getAllByName(URL)
+
             val sb = StringBuilder()
             sb.addTasks( rs.toList())
             call.respondText(sb.toString())
-
 
             //sb.append("{ tasks: [")
             //rs.toSequence().forEach {
