@@ -191,7 +191,10 @@ fun Application.configureRouting() {
 
             stm.execute("insert into tasks(name, done, date) values (\'${task.name}\', ${task.done}, \'${task.date}\' )")
 
-            call.respondText(task.toString())
+            val rs = stm.executeQuery("select id, name, done, date from tasks where id in (select max(id) from tasks)")
+            val taskRes = rs.toList().firstOrNull() ?: return@get call.respond(HttpStatusCode.NotFound)
+
+            call.respondText(taskRes.toString())
         }
 
         get("tasks/{id}") { // получим сведения о задаче. И возможно установим новые значения
